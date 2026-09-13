@@ -1,6 +1,6 @@
 # DroneCare 🚁
 
-**Advanced Predictive Maintenance Ecosystem for Drone Fleets, powered by a deep learning (ANN) model.**
+**An Intelligent System for Predicting Drone Failures Using AI.**
 
 > Graduation Project — University of Technology and Applied Sciences (UTAS), AI Division, 2026
 
