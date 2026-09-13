@@ -1,4 +1,4 @@
-# DroneCare AI 🚁
+# DroneCare 🚁
 
 **Advanced Predictive Maintenance Ecosystem for Drone Fleets, powered by a deep learning (ANN) model.**
 
