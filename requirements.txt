@@ -1,0 +1,18 @@
+# Core dependencies required to run the Streamlit application
+# (DRONE_CARE_ANN_APP.py)
+streamlit==1.51.0
+pandas==2.3.3
+numpy==2.3.5
+plotly==6.3.0
+tensorflow==2.21.0
+scikit-learn==1.7.2
+# Required by plotly's OLS trendline used on the Dashboard page
+statsmodels==0.14.5
+
+# Additional dependencies used only in the model training / EDA notebook
+# (DRONE_CARE_CODE.ipynb)
+matplotlib==3.10.6
+seaborn==0.13.2
+xgboost==3.2.0
+imbalanced-learn==0.14.0
+shap==0.50.0
