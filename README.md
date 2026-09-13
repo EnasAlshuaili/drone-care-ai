@@ -8,7 +8,7 @@
 
 ## 1. Project Overview
 
-DroneCare is an AI-powered predictive maintenance system for commercial drone fleets. It analyzes flight telemetry (battery level, wind speed, payload, GPS accuracy, altitude, etc.) and uses a trained **Artificial Neural Network (ANN)** to estimate the risk of a flight ending in failure ("Landed Unexpectedly") *before* the drone takes off. The project includes a full data-science workflow — data cleaning, exploratory analysis, model comparison, hyperparameter tuning — and an interactive **Streamlit** web application that exposes the trained model for real-time predictions and fleet analytics.
+DroneCare is an AI-powered predictive maintenance system for commercial drone fleets. It analyzes flight telemetry (battery level, wind speed, payload, GPS accuracy, altitude, etc.) and uses a trained **Artificial Neural Network (ANN)** to estimate the risk of a flight ending in failure ("Landed Unexpectedly") *before* the drone takes off. The project includes a full data-science workflow — data cleaning, exploratory analysis, model comparison, hyperparameter tuning — and an interactive **Streamlit** web application that exposes the trained model for on-demand risk predictions on planned missions, plus historical fleet analytics.
 
 ## 2. Problem Statement
 
@@ -34,7 +34,7 @@ The Streamlit app (`DRONE_CARE_ANN_APP.py`) is organized into five sections:
 
 - **🏠 Home** — Landing page introducing the project and its purpose.
 - **📊 Dashboard** — Interactive fleet analytics: KPIs (total missions, average battery, critical wind speed, incident probability), telemetry distribution histograms, mission status breakdown, success rate by drone model, and a feature correlation heatmap. Results can be filtered by drone model.
-- **🚁 Manual Input** — A form where an operator enters mission parameters (battery, wind speed, GPS accuracy, payload weight, drone model, application type, altitude, etc.). On submission, the inputs are encoded, scaled, and passed to the trained ANN, which returns a "Completed" or "Landed Unexpectedly" prediction with a confidence/risk score, plus a safety recommendation.
+- **🚁 Manual Input** — A form where an operator enters the parameters of a **planned mission** (battery, wind speed, GPS accuracy, payload weight, drone model, application type, altitude, etc.) to assess it **before the flight takes place**. On submission, the inputs are encoded, scaled, and passed to the trained ANN, which returns a "Completed" or "Landed Unexpectedly" prediction with a confidence/risk score, plus a safety recommendation.
 - **📈 Model Performance** — Displays the ANN's headline evaluation metrics and a short explanation of why an ANN was chosen, alongside a feature-impact chart.
 - **👥 About Us** — Project mission, objectives, and team/university context.
 
@@ -91,7 +91,7 @@ Input (13 features)
 - **Optimizer:** Adam (learning rate = 0.001)
 - **Loss function:** Binary cross-entropy
 - **Training:** Trained on the SMOTE-balanced training set (652 samples) with early stopping on validation loss.
-- **Model selection:** This architecture and its hyperparameters (hidden layer sizes, dropout rate, learning rate) were the outcome of a grid search over multiple configurations, evaluated against classical ML baselines (Logistic Regression, Random Forest, XGBoost, SVM) tuned with `GridSearchCV`. The ANN was selected as the **final production model** because it achieved the highest accuracy on the held-out test set.
+- **Model selection:** This architecture and its hyperparameters (hidden layer sizes, dropout rate, learning rate) were the outcome of a grid search over multiple configurations, evaluated against classical ML baselines (Logistic Regression, Random Forest, XGBoost, SVM) tuned with `GridSearchCV`. The ANN was selected as the **final model integrated into the Streamlit application** because it achieved the highest accuracy on the held-out test set.
 
 ## 8. Model Evaluation / Results
 
@@ -132,7 +132,7 @@ Evaluation on the 20% held-out test set (108 samples), as computed in `DRONE_CAR
 ## 10. Project Structure
 
 ```
-DRONE_CARE_Code_data/
+drone-care-ai/
 ├── DRONE_CARE_ANN_APP.py    # Streamlit application (dashboard + ANN inference)
 ├── DRONE_CARE_CODE.ipynb    # Data cleaning, EDA, model training, tuning & evaluation
 ├── ann2_model.h5            # Trained ANN model (required by the app)
@@ -150,8 +150,8 @@ DRONE_CARE_Code_data/
 
 1. Clone the repository:
    ```bash
-   git clone <your-repository-url>
-   cd DRONE_CARE_Code_data
+   git clone https://github.com/EnasAlshuaili/drone-care-ai.git
+   cd drone-care-ai
    ```
 2. Create and activate a virtual environment:
    ```bash
