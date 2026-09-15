@@ -13,6 +13,11 @@ venv/
 env/
 ENV/
 
+# ===== Node / Frontend =====
+node_modules/
+frontend/dist/
+frontend/.vite/
+
 # ===== Jupyter =====
 .ipynb_checkpoints/
 

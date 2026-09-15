@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dronecare}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      POSTGRES_DB: ${POSTGRES_DB:-dronecare}
+    ports:
+      - "5432:5432"
+    volumes:
+      - dronecare_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dronecare}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://dronecare:change-me@db:5432/dronecare}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      # ML artifacts (Phase 6): backend/app/core/config.py's default
+      # ML_MODEL_PATH/ML_SCALER_PATH/ML_ENCODERS_PATH are "../<file>",
+      # resolved relative to the container's /app working directory — i.e.
+      # they expect these files at the container root, mounted read-only
+      # straight from the repo root rather than copied into the image, so a
+      # different model/scaler/encoder set can be swapped in without a
+      # rebuild.
+      - ./ann2_model.h5:/ann2_model.h5:ro
+      - ./scaler2.pkl:/scaler2.pkl:ro
+      - ./encoders.pkl:/encoders.pkl:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: ${BACKEND_URL:-http://localhost:8000}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  dronecare_db_data:

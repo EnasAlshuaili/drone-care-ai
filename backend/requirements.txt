@@ -1,0 +1,28 @@
+# DroneCare backend — Phase 1 (API foundation) + Phase 2 (database + auth) dependencies.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.5
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+email-validator==2.2.0
+
+# --- Database (Phase 2) ---
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+alembic==1.14.0
+
+# --- Authentication (Phase 2) ---
+# bcrypt: purpose-built, well-vetted password hashing algorithm (see
+# app/core/security.py for the full rationale). pyjwt: minimal, actively
+# maintained JWT implementation used for both access and password-reset tokens.
+bcrypt==4.2.1
+pyjwt==2.10.1
+
+# --- AI / ML (Phase 6 — ANN model integration) ---
+# tensorflow-cpu: loads the existing ann2_model.h5 (Keras 3, saved with
+# keras_version 3.13.2) for inference only — no training happens here.
+# scikit-learn: unpickles scaler2.pkl (StandardScaler) and encoders.pkl
+# (LabelEncoder dict); 1.7.2 matches the version the artifacts were pickled
+# with, avoiding sklearn's cross-version unpickling warnings.
+tensorflow-cpu==2.19.0
+scikit-learn==1.7.2
