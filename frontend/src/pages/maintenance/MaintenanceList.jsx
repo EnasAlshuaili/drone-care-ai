@@ -3,16 +3,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import { listDrones } from "../../api/drones.js";
 import { getErrorMessage } from "../../api/errors.js";
 import { listMaintenance } from "../../api/maintenance.js";
+import { StatusBadge } from "../../components/StatusBadge.jsx";
+import { IconWrench } from "../../components/icons.jsx";
 
 const PAGE_SIZE = 20;
-
-const STATUS_COLORS = {
-  Scheduled: "inherit",
-  "In Progress": "#eda100",
-  Completed: "#0ca30c",
-  Overdue: "#d03b3b",
-  Cancelled: "#898781",
-};
 
 // Global "Maintenance" list (optionally narrowed to one drone via
 // ?droneId=), sorted by scheduled date. Also serves as the schedule view —
@@ -58,17 +52,25 @@ export default function MaintenanceList() {
   const droneName = (id) => drones.find((d) => d.id === id)?.name || id;
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Maintenance</h1>
-        <Link to={droneId ? `/maintenance/new?droneId=${droneId}` : "/maintenance/new"}>
-          <button>Add maintenance record</button>
-        </Link>
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Service & Care</span>
+          <h1>Maintenance</h1>
+          <p>Service history and scheduled maintenance for your fleet.</p>
+        </div>
+        <div className="dc-actions">
+          <Link to={droneId ? `/maintenance/new?droneId=${droneId}` : "/maintenance/new"} className="dc-btn dc-btn-primary">
+            + Add record
+          </Link>
+        </div>
       </div>
 
-      <div style={{ margin: "1rem 0" }}>
-        <label htmlFor="droneFilter">Drone: </label>
-        <select id="droneFilter" value={droneId} onChange={handleDroneFilterChange}>
+      <div className="dc-card" style={{ marginBottom: "1.5rem", padding: "1rem" }}>
+        <label className="dc-label" htmlFor="droneFilter" style={{ marginRight: "0.75rem" }}>
+          Drone
+        </label>
+        <select id="droneFilter" className="dc-select" style={{ width: 240, display: "inline-block" }} value={droneId} onChange={handleDroneFilterChange}>
           <option value="">All my drones</option>
           {drones.map((drone) => (
             <option key={drone.id} value={drone.id}>
@@ -78,48 +80,56 @@ export default function MaintenanceList() {
         </select>
       </div>
 
-      {isLoading && <p>Loading maintenance records…</p>}
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {isLoading && <div className="dc-skeleton" style={{ height: 220 }} />}
+      {error && <p className="dc-error-text">{error}</p>}
 
       {!isLoading && !error && records.length === 0 && (
-        <p>No maintenance records yet. Add your first record to get started.</p>
+        <div className="dc-card dc-state">
+          <div className="dc-state-icon">
+            <IconWrench />
+          </div>
+          <h2 style={{ fontSize: "1.1rem" }}>No maintenance records yet</h2>
+          <p>Add your first record to get started.</p>
+        </div>
       )}
 
       {!isLoading && !error && records.length > 0 && (
         <>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-                <th>Scheduled date</th>
-                <th>Drone</th>
-                <th>Type</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {records.map((record) => (
-                <tr key={record.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td>
-                    <Link to={`/maintenance/${record.id}`}>{record.scheduled_date || "—"}</Link>
-                  </td>
-                  <td>{droneName(record.drone_id)}</td>
-                  <td>{record.maintenance_type}</td>
-                  <td style={{ color: STATUS_COLORS[record.status] || "inherit", fontWeight: "bold" }}>
-                    {record.status}
-                  </td>
+          <div className="dc-table-wrap">
+            <table className="dc-table">
+              <thead>
+                <tr>
+                  <th>Scheduled date</th>
+                  <th>Drone</th>
+                  <th>Type</th>
+                  <th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {records.map((record) => (
+                  <tr key={record.id}>
+                    <td>
+                      <Link to={`/maintenance/${record.id}`}>{record.scheduled_date || "—"}</Link>
+                    </td>
+                    <td className="dc-muted">{droneName(record.drone_id)}</td>
+                    <td className="dc-muted">{record.maintenance_type}</td>
+                    <td>
+                      <StatusBadge status={record.status} kind="maintenance" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
+            <button className="dc-btn dc-btn-secondary dc-btn-sm" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
               Previous
             </button>
-            <span>
+            <span className="dc-muted" style={{ fontSize: "0.85rem" }}>
               {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
             </span>
-            <button disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>
+            <button className="dc-btn dc-btn-secondary dc-btn-sm" disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>
               Next
             </button>
           </div>

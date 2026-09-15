@@ -2,28 +2,31 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getDashboardSummary } from "../api/analytics.js";
 import { getErrorMessage } from "../api/errors.js";
+import { listNotifications } from "../api/notifications.js";
+import { IconAlertTriangle, IconBell, IconChart, IconClock, IconDrone, IconShieldCheck } from "../components/icons.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
-import { riskColor } from "./predictions/riskLevel.js";
+import { notificationIconFor } from "./notifications/notificationMeta.js";
+import { riskBadgeClass } from "./predictions/riskLevel.js";
 
-const TILE_STYLE = {
-  border: "1px solid #ddd",
-  borderRadius: 6,
-  padding: "1rem",
-  minWidth: 140,
-  flex: "1 1 140px",
-};
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
 
 // FR-DASH-01: fleet overview using live data, refreshed on load. "Recent
 // alerts" (also in FR-DASH-01's acceptance criteria) is intentionally
-// still omitted — it belongs to the Notification Center's own surface, not
-// a Dashboard field, and Phase 10's scope only covers closing the
-// maintenance-related gap ("upcoming maintenance count", added below); see
-// backend/app/schemas/analytics.py.
+// still omitted as its own KPI — it belongs to the Notification Center's
+// own surface — but a lightweight real-data preview is shown below,
+// reusing the existing GET /notifications endpoint (Phase 9).
 export default function Dashboard() {
   const { user } = useAuth();
   const [summary, setSummary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [recentNotifications, setRecentNotifications] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,89 +41,178 @@ export default function Dashboard() {
     };
   }, []);
 
-  return (
-    <div>
-      <h1>DroneCare</h1>
-      <p>Signed in as {user?.email}.</p>
+  useEffect(() => {
+    listNotifications({ limit: 5 })
+      .then((data) => setRecentNotifications(data.items))
+      .catch(() => setRecentNotifications([]));
+  }, []);
 
-      {isLoading && <p>Loading dashboard…</p>}
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+  return (
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Fleet Overview</span>
+          <h1>
+            {greeting()}
+            {user?.full_name ? `, ${user.full_name.split(" ")[0]}` : ""}
+          </h1>
+          <p>Monitor your fleet and predict failures with AI.</p>
+        </div>
+      </div>
+
+      {isLoading && (
+        <div className="dc-grid dc-grid-cards" style={{ marginBottom: "1.5rem" }}>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="dc-skeleton" style={{ height: 96 }} />
+          ))}
+        </div>
+      )}
+
+      {error && <p className="dc-error-text">{error}</p>}
 
       {!isLoading && !error && summary && summary.total_drones === 0 && (
-        <p>
-          No drones yet. <Link to="/drones/new">Add your first drone</Link> to get started.
-        </p>
+        <div className="dc-card dc-state">
+          <div className="dc-state-icon">
+            <IconDrone />
+          </div>
+          <h2 style={{ fontSize: "1.1rem" }}>No drones yet</h2>
+          <p>Add your first drone to start monitoring and predicting failures.</p>
+          <Link to="/drones/new" className="dc-btn dc-btn-primary" style={{ marginTop: "0.5rem" }}>
+            Add your first drone
+          </Link>
+        </div>
       )}
 
       {!isLoading && !error && summary && summary.total_drones > 0 && (
         <>
-          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "1rem 0" }}>
-            <div style={TILE_STYLE}>
-              <div style={{ color: "#52514e", fontSize: "0.85rem" }}>Total drones</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600 }}>{summary.total_drones}</div>
-            </div>
-            <div style={TILE_STYLE}>
-              <div style={{ color: "#52514e", fontSize: "0.85rem" }}>Active drones</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600 }}>{summary.active_drones}</div>
-            </div>
-            <div style={TILE_STYLE}>
-              <div style={{ color: "#52514e", fontSize: "0.85rem" }}>Requiring attention</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600 }}>{summary.drones_requiring_attention}</div>
-            </div>
-            <div style={TILE_STYLE}>
-              <div style={{ color: "#52514e", fontSize: "0.85rem" }}>High risk</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600, color: summary.high_risk_drones > 0 ? "#d03b3b" : "inherit" }}>
-                {summary.high_risk_drones}
-              </div>
-            </div>
-            <div style={TILE_STYLE}>
-              <div style={{ color: "#52514e", fontSize: "0.85rem" }}>Upcoming maintenance</div>
-              <div style={{ fontSize: "1.75rem", fontWeight: 600 }}>{summary.upcoming_maintenance_count}</div>
-            </div>
+          <div className="dc-grid dc-grid-cards" style={{ marginBottom: "1.5rem" }}>
+            <StatCard icon={IconDrone} label="Total drones" value={summary.total_drones} to="/drones" />
+            <StatCard icon={IconShieldCheck} label="Active drones" value={summary.active_drones} to="/drones" tone="success" />
+            <StatCard
+              icon={IconAlertTriangle}
+              label="Requiring attention"
+              value={summary.drones_requiring_attention}
+              to="/drones"
+              tone={summary.drones_requiring_attention > 0 ? "warning" : undefined}
+            />
+            <StatCard
+              icon={IconAlertTriangle}
+              label="High risk"
+              value={summary.high_risk_drones}
+              to="/predictions"
+              tone={summary.high_risk_drones > 0 ? "danger" : undefined}
+            />
+            <StatCard
+              icon={IconClock}
+              label="Upcoming maintenance"
+              value={summary.upcoming_maintenance_count}
+              to="/maintenance"
+            />
           </div>
 
-          <p>
-            <Link to="/drones">My Drones</Link> · <Link to="/maintenance">Maintenance</Link> ·{" "}
-            <Link to="/analytics">Analytics</Link>
-          </p>
+          <div className="dc-two-col">
+            <div className="dc-card">
+              <div className="dc-card-header">
+                <h2>Recent predictions</h2>
+                <Link to="/predictions" className="dc-btn dc-btn-ghost dc-btn-sm">
+                  View all
+                </Link>
+              </div>
 
-          <h2>Recent predictions</h2>
-          {summary.recent_predictions.length === 0 && (
-            <p>
-              No predictions yet. <Link to="/predictions/new">Run your first prediction</Link>.
-            </p>
-          )}
-          {summary.recent_predictions.length > 0 && (
-            <table style={{ width: "100%", borderCollapse: "collapse", maxWidth: 640 }}>
-              <thead>
-                <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-                  <th>Date/time</th>
-                  <th>Risk level</th>
-                  <th>Failure probability</th>
-                </tr>
-              </thead>
-              <tbody>
-                {summary.recent_predictions.map((prediction) => (
-                  <tr key={prediction.id} style={{ borderBottom: "1px solid #eee" }}>
-                    <td>
-                      <Link to={`/predictions/${prediction.id}`}>
-                        {new Date(prediction.created_at).toLocaleString()}
-                      </Link>
-                    </td>
-                    <td style={{ color: riskColor(prediction.risk_level), fontWeight: "bold" }}>
-                      {prediction.risk_level}
-                    </td>
-                    <td>{(prediction.failure_probability * 100).toFixed(1)}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <p>
-            <Link to="/predictions">View all predictions</Link>
-          </p>
+              {summary.recent_predictions.length === 0 && (
+                <div className="dc-state">
+                  <div className="dc-state-icon">
+                    <IconChart />
+                  </div>
+                  <p>
+                    No predictions yet. <Link to="/predictions/new">Run your first prediction</Link>.
+                  </p>
+                </div>
+              )}
+
+              {summary.recent_predictions.length > 0 && (
+                <div className="dc-table-wrap">
+                  <table className="dc-table">
+                    <thead>
+                      <tr>
+                        <th>Date/time</th>
+                        <th>Risk</th>
+                        <th>Probability</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {summary.recent_predictions.map((prediction) => (
+                        <tr key={prediction.id}>
+                          <td>
+                            <Link to={`/predictions/${prediction.id}`}>
+                              {new Date(prediction.created_at).toLocaleString()}
+                            </Link>
+                          </td>
+                          <td>
+                            <span className={`dc-badge ${riskBadgeClass(prediction.risk_level)}`}>
+                              {prediction.risk_level}
+                            </span>
+                          </td>
+                          <td>{(prediction.failure_probability * 100).toFixed(1)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="dc-card">
+              <div className="dc-card-header">
+                <h2>Recent notifications</h2>
+                <Link to="/notifications" className="dc-btn dc-btn-ghost dc-btn-sm">
+                  View all
+                </Link>
+              </div>
+
+              {recentNotifications.length === 0 && (
+                <div className="dc-state">
+                  <div className="dc-state-icon">
+                    <IconBell />
+                  </div>
+                  <p>No notifications yet.</p>
+                </div>
+              )}
+
+              {recentNotifications.map((notification) => {
+                const meta = notificationIconFor(notification.type);
+                return (
+                  <div key={notification.id} style={{ display: "flex", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--dc-border)" }}>
+                    <span className="dc-notif-icon" style={{ background: meta.soft, color: meta.color }}>
+                      <meta.Icon />
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--dc-text)" }}>{notification.title}</div>
+                      <div style={{ fontSize: "0.78rem", color: "var(--dc-text-faint)" }}>
+                        {new Date(notification.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </>
       )}
     </div>
+  );
+}
+
+function StatCard({ icon: Icon, label, value, to, tone }) {
+  return (
+    <Link to={to} className="dc-stat" style={{ textDecoration: "none" }}>
+      <div className="dc-stat-label">
+        <span className="dc-stat-icon">
+          <Icon />
+        </span>
+        {label}
+      </div>
+      <div className={`dc-stat-value${tone ? ` is-${tone}` : ""}`}>{value}</div>
+    </Link>
   );
 }

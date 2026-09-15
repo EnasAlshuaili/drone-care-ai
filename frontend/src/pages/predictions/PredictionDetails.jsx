@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { getDrone } from "../../api/drones.js";
 import { getErrorMessage } from "../../api/errors.js";
 import { getPrediction } from "../../api/predictions.js";
+import { IconArrowLeft } from "../../components/icons.jsx";
 import { riskColor, riskRecommendation } from "./riskLevel.js";
 
 // input_features keys are exactly PredictionCreate's field names (see
@@ -53,47 +54,87 @@ export default function PredictionDetails() {
     };
   }, [predictionId]);
 
-  if (isLoading) return <p>Loading prediction…</p>;
-  if (error) return <p style={{ color: "crimson" }}>{error}</p>;
+  if (isLoading) {
+    return (
+      <div className="dc-page">
+        <div className="dc-skeleton" style={{ height: 320 }} />
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="dc-page">
+        <p className="dc-error-text">{error}</p>
+      </div>
+    );
+  }
   if (!prediction) return null;
 
+  const probabilityPct = prediction.failure_probability * 100;
+  const color = riskColor(prediction.risk_level);
+
   return (
-    <div>
-      <p>
-        <Link to="/predictions">&larr; Back to Predictions</Link>
-      </p>
-      <h1>Prediction — {new Date(prediction.created_at).toLocaleString()}</h1>
+    <div className="dc-page">
+      <Link to="/predictions" className="dc-link-back">
+        <IconArrowLeft /> Back to Predictions
+      </Link>
 
-      <dl>
-        <dt>Drone</dt>
-        <dd>{drone ? <Link to={`/drones/${drone.id}`}>{drone.name}</Link> : prediction.drone_id}</dd>
-        <dt>Failure probability</dt>
-        <dd>{(prediction.failure_probability * 100).toFixed(1)}%</dd>
-        <dt>Risk level</dt>
-        <dd style={{ color: riskColor(prediction.risk_level), fontWeight: "bold" }}>
-          {prediction.risk_level}
-        </dd>
-        <dt>Recommendation</dt>
-        <dd>{riskRecommendation(prediction.risk_level)}</dd>
-        <dt>Model version</dt>
-        <dd>{prediction.model_version}</dd>
-      </dl>
-
-      <h2>Input telemetry</h2>
-      <dl>
-        {FEATURE_LABELS.map(([key, label]) => (
-          <div key={key}>
-            <dt>{label}</dt>
-            <dd>
-              {typeof prediction.input_features[key] === "boolean"
-                ? prediction.input_features[key]
-                  ? "Yes"
-                  : "No"
-                : prediction.input_features[key]}
-            </dd>
+      <div className="dc-card" style={{ marginBottom: "1.5rem" }}>
+        <div className="dc-result-hero">
+          <div className="dc-result-eyebrow">AI Failure Prediction</div>
+          <div className="dc-result-risk" style={{ color }}>
+            {prediction.risk_level} RISK
           </div>
-        ))}
-      </dl>
+          <div className="dc-result-prob" style={{ color }}>
+            {probabilityPct.toFixed(1)}%
+          </div>
+          <p style={{ marginTop: "0.25rem" }}>Failure probability</p>
+          <div className="dc-progress-track">
+            <div className="dc-progress-fill" style={{ width: `${probabilityPct}%`, background: color }} />
+          </div>
+          <p style={{ marginTop: "1.25rem", maxWidth: 420, marginInline: "auto" }}>{riskRecommendation(prediction.risk_level)}</p>
+        </div>
+      </div>
+
+      <div className="dc-card" style={{ marginBottom: "1.5rem" }}>
+        <div className="dc-card-header">
+          <h2>Prediction details</h2>
+        </div>
+        <dl className="dc-detail-list">
+          <div className="dc-detail-item">
+            <dt>Drone</dt>
+            <dd>{drone ? <Link to={`/drones/${drone.id}`}>{drone.name}</Link> : prediction.drone_id}</dd>
+          </div>
+          <div className="dc-detail-item">
+            <dt>Timestamp</dt>
+            <dd>{new Date(prediction.created_at).toLocaleString()}</dd>
+          </div>
+          <div className="dc-detail-item">
+            <dt>Model version</dt>
+            <dd style={{ fontSize: "0.82rem" }}>{prediction.model_version}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="dc-card">
+        <div className="dc-card-header">
+          <h2>Input telemetry</h2>
+        </div>
+        <dl className="dc-detail-list">
+          {FEATURE_LABELS.map(([key, label]) => (
+            <div key={key} className="dc-detail-item">
+              <dt>{label}</dt>
+              <dd>
+                {typeof prediction.input_features[key] === "boolean"
+                  ? prediction.input_features[key]
+                    ? "Yes"
+                    : "No"
+                  : prediction.input_features[key]}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </div>
   );
 }

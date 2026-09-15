@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listDrones } from "../../api/drones.js";
 import { getErrorMessage } from "../../api/errors.js";
+import { StatusBadge } from "../../components/StatusBadge.jsx";
+import { IconDrone, IconSearch } from "../../components/icons.jsx";
 
 const STATUS_OPTIONS = ["active", "inactive", "maintenance", "retired"];
 
@@ -35,22 +37,34 @@ export default function DroneList() {
   }
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>My Drones</h1>
-        <Link to="/drones/new">
-          <button>Add drone</button>
-        </Link>
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Fleet</span>
+          <h1>My Drones</h1>
+          <p>Manage and monitor every drone in your fleet.</p>
+        </div>
+        <div className="dc-actions">
+          <Link to="/drones/new" className="dc-btn dc-btn-primary">
+            + Add drone
+          </Link>
+        </div>
       </div>
 
-      <form onSubmit={handleFilterSubmit} style={{ margin: "1rem 0", display: "flex", gap: "0.5rem" }}>
-        <input
-          type="text"
-          placeholder="Search by name or serial number"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+      <form onSubmit={handleFilterSubmit} className="dc-card" style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem", padding: "1rem" }}>
+        <div className="dc-input-icon-wrap" style={{ flex: "1 1 220px" }}>
+          <span className="dc-input-icon">
+            <IconSearch />
+          </span>
+          <input
+            type="text"
+            className="dc-input"
+            placeholder="Search by name or serial number"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <select className="dc-select" style={{ width: 180 }} value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">All statuses</option>
           {STATUS_OPTIONS.map((option) => (
             <option key={option} value={option}>
@@ -58,41 +72,56 @@ export default function DroneList() {
             </option>
           ))}
         </select>
-        <button type="submit">Filter</button>
+        <button type="submit" className="dc-btn dc-btn-secondary">
+          Filter
+        </button>
       </form>
 
-      {isLoading && <p>Loading drones…</p>}
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {isLoading && <div className="dc-skeleton" style={{ height: 220 }} />}
+      {error && <p className="dc-error-text">{error}</p>}
 
       {!isLoading && !error && drones.length === 0 && (
-        <p>No drones yet. Add your first drone to get started.</p>
+        <div className="dc-card dc-state">
+          <div className="dc-state-icon">
+            <IconDrone />
+          </div>
+          <h2 style={{ fontSize: "1.1rem" }}>No drones found</h2>
+          <p>Add your first drone to get started, or adjust your filters.</p>
+          <Link to="/drones/new" className="dc-btn dc-btn-primary" style={{ marginTop: "0.5rem" }}>
+            Add drone
+          </Link>
+        </div>
       )}
 
       {!isLoading && !error && drones.length > 0 && (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-              <th>Name</th>
-              <th>Serial number</th>
-              <th>Manufacturer</th>
-              <th>Status</th>
-              <th>Health</th>
-            </tr>
-          </thead>
-          <tbody>
-            {drones.map((drone) => (
-              <tr key={drone.id} style={{ borderBottom: "1px solid #eee" }}>
-                <td>
-                  <Link to={`/drones/${drone.id}`}>{drone.name}</Link>
-                </td>
-                <td>{drone.serial_number}</td>
-                <td>{drone.manufacturer || "—"}</td>
-                <td>{drone.status}</td>
-                <td>{drone.health_status}</td>
+        <div className="dc-table-wrap">
+          <table className="dc-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Serial number</th>
+                <th>Manufacturer</th>
+                <th>Status</th>
+                <th>Health</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {drones.map((drone) => (
+                <tr key={drone.id}>
+                  <td>
+                    <Link to={`/drones/${drone.id}`}>{drone.name}</Link>
+                  </td>
+                  <td className="dc-muted">{drone.serial_number}</td>
+                  <td className="dc-muted">{drone.manufacturer || "—"}</td>
+                  <td>
+                    <StatusBadge status={drone.status} kind="drone" />
+                  </td>
+                  <td className="dc-muted">{drone.health_status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

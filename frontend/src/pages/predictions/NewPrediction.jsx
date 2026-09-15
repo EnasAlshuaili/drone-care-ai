@@ -117,17 +117,11 @@ export default function NewPrediction() {
   function categorySelect(field, label) {
     const options = categoryValues[field] || [];
     return (
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor={field}>{label} *</label>
-        <br />
-        <select
-          id={field}
-          required
-          value={values[field]}
-          onChange={handleChange(field)}
-          style={{ width: "100%" }}
-          disabled={isLoadingSchema}
-        >
+      <div className="dc-field">
+        <label className="dc-label" htmlFor={field}>
+          {label} <span className="dc-required">*</span>
+        </label>
+        <select id={field} required className="dc-select" value={values[field]} onChange={handleChange(field)} disabled={isLoadingSchema}>
           <option value="" disabled>
             {isLoadingSchema ? "Loading…" : "Select"}
           </option>
@@ -143,39 +137,31 @@ export default function NewPrediction() {
 
   function numberInput(field, label, { min = 0, max } = {}) {
     return (
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor={field}>{label} *</label>
-        <br />
-        <input
-          id={field}
-          type="number"
-          required
-          min={min}
-          max={max}
-          step="any"
-          value={values[field]}
-          onChange={handleChange(field)}
-          style={{ width: "100%" }}
-        />
+      <div className="dc-field">
+        <label className="dc-label" htmlFor={field}>
+          {label} <span className="dc-required">*</span>
+        </label>
+        <input id={field} type="number" required min={min} max={max} step="any" className="dc-input" value={values[field]} onChange={handleChange(field)} />
       </div>
     );
   }
 
   return (
-    <div>
-      <h1>New prediction</h1>
-      <p>Enter telemetry available before or at the start of the flight. Fields only known after a flight (like flight duration) are not part of a prediction.</p>
-      <form onSubmit={handleSubmit} style={{ maxWidth: 420 }}>
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="drone_id">Drone *</label>
-          <br />
-          <select
-            id="drone_id"
-            required
-            value={values.drone_id}
-            onChange={handleChange("drone_id")}
-            style={{ width: "100%" }}
-          >
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">AI Monitoring</span>
+          <h1>New prediction</h1>
+          <p>Enter telemetry available before or at the start of the flight. Fields only known after a flight (like flight duration) are not part of a prediction.</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="dc-form dc-card" style={{ maxWidth: 560 }}>
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="drone_id">
+            Drone <span className="dc-required">*</span>
+          </label>
+          <select id="drone_id" required className="dc-select" value={values.drone_id} onChange={handleChange("drone_id")}>
             <option value="" disabled>
               Select a drone
             </option>
@@ -187,34 +173,40 @@ export default function NewPrediction() {
           </select>
         </div>
 
-        {categorySelect("drone_size", "Drone size")}
-        {categorySelect("drone_model", "Drone model")}
-        {categorySelect("payload_type", "Payload type")}
-        {categorySelect("application", "Application")}
-
-        {numberInput("propeller_count", "Propeller count", { min: 1 })}
-        {numberInput("max_carry_weight", "Max carry weight (kg)", { min: 0.01 })}
-        {numberInput("actual_carry_weight", "Actual carry weight (kg)")}
-        {numberInput("altitude", "Altitude (m)")}
-        {numberInput("distance_flown", "Distance flown")}
-        {numberInput("battery_remaining", "Battery remaining (%)", { min: 0, max: 100 })}
-        {numberInput("gps_accuracy", "GPS accuracy (m)")}
-        {numberInput("wind_speed", "Wind speed")}
-
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label>
-            <input
-              type="checkbox"
-              checked={values.obstacles_encountered}
-              onChange={handleChange("obstacles_encountered")}
-            />{" "}
-            Obstacles encountered
-          </label>
+        <div className="dc-form-row">
+          {categorySelect("drone_size", "Drone size")}
+          {categorySelect("drone_model", "Drone model")}
+        </div>
+        <div className="dc-form-row">
+          {categorySelect("payload_type", "Payload type")}
+          {categorySelect("application", "Application")}
         </div>
 
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
+        <div className="dc-form-row">
+          {numberInput("propeller_count", "Propeller count", { min: 1 })}
+          {numberInput("max_carry_weight", "Max carry weight (kg)", { min: 0.01 })}
+        </div>
+        <div className="dc-form-row">
+          {numberInput("actual_carry_weight", "Actual carry weight (kg)")}
+          {numberInput("altitude", "Altitude (m)")}
+        </div>
+        <div className="dc-form-row">
+          {numberInput("distance_flown", "Distance flown")}
+          {numberInput("battery_remaining", "Battery remaining (%)", { min: 0, max: 100 })}
+        </div>
+        <div className="dc-form-row">
+          {numberInput("gps_accuracy", "GPS accuracy (m)")}
+          {numberInput("wind_speed", "Wind speed")}
+        </div>
 
-        <button type="submit" disabled={isSubmitting || isLoadingSchema}>
+        <label className="dc-checkbox-row" style={{ marginBottom: "1.25rem" }}>
+          <input type="checkbox" checked={values.obstacles_encountered} onChange={handleChange("obstacles_encountered")} />
+          Obstacles encountered
+        </label>
+
+        {error && <p className="dc-error-text" style={{ marginBottom: "1rem" }}>{error}</p>}
+
+        <button type="submit" className="dc-btn dc-btn-primary" disabled={isSubmitting || isLoadingSchema}>
           {isSubmitting ? "Running prediction…" : "Run prediction"}
         </button>
       </form>

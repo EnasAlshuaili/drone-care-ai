@@ -22,3 +22,7 @@ export function logout() {
 export function getCurrentUser() {
   return apiClient.get("/api/v1/auth/me").then((res) => res.data);
 }
+
+export function forgotPassword(email) {
+  return apiClient.post("/api/v1/auth/forgot-password", { email }).then((res) => res.data);
+}

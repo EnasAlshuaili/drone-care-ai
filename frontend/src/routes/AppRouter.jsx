@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard.jsx";
+import ForgotPassword from "../pages/ForgotPassword.jsx";
 import Login from "../pages/Login.jsx";
 import NotFound from "../pages/NotFound.jsx";
 import Register from "../pages/Register.jsx";
@@ -18,143 +19,42 @@ import NotificationList from "../pages/notifications/NotificationList.jsx";
 import NewPrediction from "../pages/predictions/NewPrediction.jsx";
 import PredictionDetails from "../pages/predictions/PredictionDetails.jsx";
 import PredictionList from "../pages/predictions/PredictionList.jsx";
-import ProtectedRoute from "./ProtectedRoute.jsx";
+import AppShell from "./AppShell.jsx";
 
-// Additional routes (profile) are added as those pages are built in later
-// phases.
+// Auth routes render full-bleed (no sidebar shell). Every other route is
+// nested under AppShell, which handles both the ProtectedRoute redirect and
+// the sidebar/topbar chrome in one place.
 export default function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/drones"
-        element={
-          <ProtectedRoute>
-            <DroneList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/drones/new"
-        element={
-          <ProtectedRoute>
-            <AddDrone />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/drones/:droneId"
-        element={
-          <ProtectedRoute>
-            <DroneDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/drones/:droneId/edit"
-        element={
-          <ProtectedRoute>
-            <EditDrone />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/flights"
-        element={
-          <ProtectedRoute>
-            <FlightList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/flights/new"
-        element={
-          <ProtectedRoute>
-            <AddFlight />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/flights/:flightId"
-        element={
-          <ProtectedRoute>
-            <FlightDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/predictions"
-        element={
-          <ProtectedRoute>
-            <PredictionList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/predictions/new"
-        element={
-          <ProtectedRoute>
-            <NewPrediction />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/predictions/:predictionId"
-        element={
-          <ProtectedRoute>
-            <PredictionDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/analytics"
-        element={
-          <ProtectedRoute>
-            <Analytics />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/notifications"
-        element={
-          <ProtectedRoute>
-            <NotificationList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/maintenance"
-        element={
-          <ProtectedRoute>
-            <MaintenanceList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/maintenance/new"
-        element={
-          <ProtectedRoute>
-            <AddMaintenance />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/maintenance/:maintenanceId"
-        element={
-          <ProtectedRoute>
-            <MaintenanceDetails />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      <Route element={<AppShell />}>
+        <Route path="/" element={<Dashboard />} />
+
+        <Route path="/drones" element={<DroneList />} />
+        <Route path="/drones/new" element={<AddDrone />} />
+        <Route path="/drones/:droneId" element={<DroneDetails />} />
+        <Route path="/drones/:droneId/edit" element={<EditDrone />} />
+
+        <Route path="/flights" element={<FlightList />} />
+        <Route path="/flights/new" element={<AddFlight />} />
+        <Route path="/flights/:flightId" element={<FlightDetails />} />
+
+        <Route path="/predictions" element={<PredictionList />} />
+        <Route path="/predictions/new" element={<NewPrediction />} />
+        <Route path="/predictions/:predictionId" element={<PredictionDetails />} />
+
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/notifications" element={<NotificationList />} />
+
+        <Route path="/maintenance" element={<MaintenanceList />} />
+        <Route path="/maintenance/new" element={<AddMaintenance />} />
+        <Route path="/maintenance/:maintenanceId" element={<MaintenanceDetails />} />
+      </Route>
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

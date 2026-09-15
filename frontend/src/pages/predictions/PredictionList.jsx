@@ -3,7 +3,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { listDrones } from "../../api/drones.js";
 import { getErrorMessage } from "../../api/errors.js";
 import { listPredictions } from "../../api/predictions.js";
-import { riskColor } from "./riskLevel.js";
+import { IconPulse } from "../../components/icons.jsx";
+import { riskBadgeClass } from "./riskLevel.js";
 
 const PAGE_SIZE = 20;
 
@@ -49,17 +50,25 @@ export default function PredictionList() {
   const droneName = (id) => drones.find((d) => d.id === id)?.name || id;
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Predictions</h1>
-        <Link to={droneId ? `/predictions/new?droneId=${droneId}` : "/predictions/new"}>
-          <button>New prediction</button>
-        </Link>
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">AI Monitoring</span>
+          <h1>Predictions</h1>
+          <p>AI failure-risk assessments across your fleet.</p>
+        </div>
+        <div className="dc-actions">
+          <Link to={droneId ? `/predictions/new?droneId=${droneId}` : "/predictions/new"} className="dc-btn dc-btn-primary">
+            + New prediction
+          </Link>
+        </div>
       </div>
 
-      <div style={{ margin: "1rem 0" }}>
-        <label htmlFor="droneFilter">Drone: </label>
-        <select id="droneFilter" value={droneId} onChange={handleDroneFilterChange}>
+      <div className="dc-card" style={{ marginBottom: "1.5rem", padding: "1rem" }}>
+        <label className="dc-label" htmlFor="droneFilter" style={{ marginRight: "0.75rem" }}>
+          Drone
+        </label>
+        <select id="droneFilter" className="dc-select" style={{ width: 240, display: "inline-block" }} value={droneId} onChange={handleDroneFilterChange}>
           <option value="">All my drones</option>
           {drones.map((drone) => (
             <option key={drone.id} value={drone.id}>
@@ -69,50 +78,59 @@ export default function PredictionList() {
         </select>
       </div>
 
-      {isLoading && <p>Loading predictions…</p>}
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {isLoading && <div className="dc-skeleton" style={{ height: 220 }} />}
+      {error && <p className="dc-error-text">{error}</p>}
 
       {!isLoading && !error && predictions.length === 0 && (
-        <p>No predictions yet. Run your first prediction to get started.</p>
+        <div className="dc-card dc-state">
+          <div className="dc-state-icon">
+            <IconPulse />
+          </div>
+          <h2 style={{ fontSize: "1.1rem" }}>No predictions yet</h2>
+          <p>Run your first prediction to get started.</p>
+          <Link to="/predictions/new" className="dc-btn dc-btn-primary" style={{ marginTop: "0.5rem" }}>
+            New prediction
+          </Link>
+        </div>
       )}
 
       {!isLoading && !error && predictions.length > 0 && (
         <>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-                <th>Date/time</th>
-                <th>Drone</th>
-                <th>Risk level</th>
-                <th>Failure probability</th>
-              </tr>
-            </thead>
-            <tbody>
-              {predictions.map((prediction) => (
-                <tr key={prediction.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td>
-                    <Link to={`/predictions/${prediction.id}`}>
-                      {new Date(prediction.created_at).toLocaleString()}
-                    </Link>
-                  </td>
-                  <td>{droneName(prediction.drone_id)}</td>
-                  <td style={{ color: riskColor(prediction.risk_level), fontWeight: "bold" }}>
-                    {prediction.risk_level}
-                  </td>
-                  <td>{(prediction.failure_probability * 100).toFixed(1)}%</td>
+          <div className="dc-table-wrap">
+            <table className="dc-table">
+              <thead>
+                <tr>
+                  <th>Date/time</th>
+                  <th>Drone</th>
+                  <th>Risk level</th>
+                  <th>Failure probability</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {predictions.map((prediction) => (
+                  <tr key={prediction.id}>
+                    <td>
+                      <Link to={`/predictions/${prediction.id}`}>{new Date(prediction.created_at).toLocaleString()}</Link>
+                    </td>
+                    <td className="dc-muted">{droneName(prediction.drone_id)}</td>
+                    <td>
+                      <span className={`dc-badge ${riskBadgeClass(prediction.risk_level)}`}>{prediction.risk_level}</span>
+                    </td>
+                    <td className="dc-muted">{(prediction.failure_probability * 100).toFixed(1)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
+            <button className="dc-btn dc-btn-secondary dc-btn-sm" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
               Previous
             </button>
-            <span>
+            <span className="dc-muted" style={{ fontSize: "0.85rem" }}>
               {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
             </span>
-            <button disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>
+            <button className="dc-btn dc-btn-secondary dc-btn-sm" disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>
               Next
             </button>
           </div>

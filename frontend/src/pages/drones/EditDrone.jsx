@@ -54,19 +54,27 @@ export default function EditDrone() {
     }
   }
 
-  if (isLoading) return <p>Loading drone…</p>;
-  if (loadError) return <p style={{ color: "crimson" }}>{loadError}</p>;
-
   return (
-    <div>
-      <h1>Edit drone</h1>
-      <DroneForm
-        initialValues={initialValues}
-        showStatus
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-        submitLabel="Save changes"
-      />
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Fleet</span>
+          <h1>Edit drone</h1>
+        </div>
+      </div>
+
+      {isLoading && <div className="dc-skeleton" style={{ height: 300, maxWidth: 440 }} />}
+      {loadError && <p className="dc-error-text">{loadError}</p>}
+
+      {!isLoading && !loadError && (
+        <DroneForm
+          initialValues={initialValues}
+          showStatus
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          submitLabel="Save changes"
+        />
+      )}
     </div>
   );
 }

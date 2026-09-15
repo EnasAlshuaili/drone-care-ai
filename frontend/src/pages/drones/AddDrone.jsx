@@ -18,8 +18,14 @@ export default function AddDrone() {
   }
 
   return (
-    <div>
-      <h1>Add drone</h1>
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Fleet</span>
+          <h1>Add drone</h1>
+          <p>Register a new drone to start tracking flights and predictions.</p>
+        </div>
+      </div>
       <DroneForm onSubmit={handleSubmit} isSubmitting={isSubmitting} submitLabel="Add drone" />
     </div>
   );

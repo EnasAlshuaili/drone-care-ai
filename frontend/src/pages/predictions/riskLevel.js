@@ -3,9 +3,15 @@
 // — this only maps that value to display color/copy, per System Specification
 // §28 principle 12 (don't claim more than is actually implemented).
 const RISK_COLORS = {
-  LOW: "#2e7d32",
-  MEDIUM: "#b26a00",
-  HIGH: "#c62828",
+  LOW: "var(--dc-success)",
+  MEDIUM: "var(--dc-warning)",
+  HIGH: "var(--dc-danger)",
+};
+
+const RISK_BADGE_CLASSES = {
+  LOW: "dc-badge-success",
+  MEDIUM: "dc-badge-warning",
+  HIGH: "dc-badge-danger",
 };
 
 const RISK_RECOMMENDATIONS = {
@@ -15,7 +21,11 @@ const RISK_RECOMMENDATIONS = {
 };
 
 export function riskColor(riskLevel) {
-  return RISK_COLORS[riskLevel] || "inherit";
+  return RISK_COLORS[riskLevel] || "var(--dc-text-muted)";
+}
+
+export function riskBadgeClass(riskLevel) {
+  return RISK_BADGE_CLASSES[riskLevel] || "dc-badge-neutral";
 }
 
 export function riskRecommendation(riskLevel) {

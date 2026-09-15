@@ -55,120 +55,137 @@ export default function DroneForm({ initialValues, showStatus = false, onSubmit,
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 420 }}>
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="name">Name *</label>
-        <br />
-        <input
-          id="name"
-          type="text"
-          required
-          maxLength={100}
-          value={values.name}
-          onChange={handleChange("name")}
-          style={{ width: "100%" }}
-        />
+    <form onSubmit={handleSubmit} className="dc-form dc-card">
+      <div className="dc-form-row">
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="name">
+            Name <span className="dc-required">*</span>
+          </label>
+          <input
+            id="name"
+            type="text"
+            required
+            maxLength={100}
+            className="dc-input"
+            value={values.name}
+            onChange={handleChange("name")}
+          />
+        </div>
+
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="serial_number">
+            Serial number <span className="dc-required">*</span>
+          </label>
+          <input
+            id="serial_number"
+            type="text"
+            required
+            maxLength={100}
+            className="dc-input"
+            value={values.serial_number}
+            onChange={handleChange("serial_number")}
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="serial_number">Serial number *</label>
-        <br />
-        <input
-          id="serial_number"
-          type="text"
-          required
-          maxLength={100}
-          value={values.serial_number}
-          onChange={handleChange("serial_number")}
-          style={{ width: "100%" }}
-        />
+      <div className="dc-form-row">
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="manufacturer">
+            Manufacturer
+          </label>
+          <input
+            id="manufacturer"
+            type="text"
+            maxLength={100}
+            className="dc-input"
+            value={values.manufacturer}
+            onChange={handleChange("manufacturer")}
+          />
+        </div>
+
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="model">
+            Model
+          </label>
+          <input
+            id="model"
+            type="text"
+            maxLength={100}
+            className="dc-input"
+            value={values.model}
+            onChange={handleChange("model")}
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="manufacturer">Manufacturer</label>
-        <br />
-        <input
-          id="manufacturer"
-          type="text"
-          maxLength={100}
-          value={values.manufacturer}
-          onChange={handleChange("manufacturer")}
-          style={{ width: "100%" }}
-        />
+      <div className="dc-form-row">
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="drone_size">
+            Drone size
+          </label>
+          <input
+            id="drone_size"
+            type="text"
+            maxLength={30}
+            placeholder="e.g. Small, Medium, Large"
+            className="dc-input"
+            value={values.drone_size}
+            onChange={handleChange("drone_size")}
+          />
+        </div>
+
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="propeller_count">
+            Propeller count
+          </label>
+          <input
+            id="propeller_count"
+            type="number"
+            min="0"
+            step="1"
+            className="dc-input"
+            value={values.propeller_count}
+            onChange={handleChange("propeller_count")}
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="model">Model</label>
-        <br />
-        <input
-          id="model"
-          type="text"
-          maxLength={100}
-          value={values.model}
-          onChange={handleChange("model")}
-          style={{ width: "100%" }}
-        />
-      </div>
+      <div className="dc-form-row">
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="max_carry_weight">
+            Max carry weight (kg)
+          </label>
+          <input
+            id="max_carry_weight"
+            type="number"
+            min="0"
+            step="0.1"
+            className="dc-input"
+            value={values.max_carry_weight}
+            onChange={handleChange("max_carry_weight")}
+          />
+        </div>
 
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="drone_size">Drone size</label>
-        <br />
-        <input
-          id="drone_size"
-          type="text"
-          maxLength={30}
-          placeholder="e.g. Small, Medium, Large"
-          value={values.drone_size}
-          onChange={handleChange("drone_size")}
-          style={{ width: "100%" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="propeller_count">Propeller count</label>
-        <br />
-        <input
-          id="propeller_count"
-          type="number"
-          min="0"
-          step="1"
-          value={values.propeller_count}
-          onChange={handleChange("propeller_count")}
-          style={{ width: "100%" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="max_carry_weight">Max carry weight (kg)</label>
-        <br />
-        <input
-          id="max_carry_weight"
-          type="number"
-          min="0"
-          step="0.1"
-          value={values.max_carry_weight}
-          onChange={handleChange("max_carry_weight")}
-          style={{ width: "100%" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "0.75rem" }}>
-        <label htmlFor="purchase_date">Purchase date</label>
-        <br />
-        <input
-          id="purchase_date"
-          type="date"
-          value={values.purchase_date}
-          onChange={handleChange("purchase_date")}
-          style={{ width: "100%" }}
-        />
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="purchase_date">
+            Purchase date
+          </label>
+          <input
+            id="purchase_date"
+            type="date"
+            className="dc-input"
+            value={values.purchase_date}
+            onChange={handleChange("purchase_date")}
+          />
+        </div>
       </div>
 
       {showStatus && (
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="status">Status</label>
-          <br />
-          <select id="status" value={values.status} onChange={handleChange("status")} style={{ width: "100%" }}>
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="status">
+            Status
+          </label>
+          <select id="status" className="dc-select" value={values.status} onChange={handleChange("status")}>
             {STATUS_OPTIONS.map((option) => (
               <option key={option} value={option}>
                 {option}
@@ -178,9 +195,9 @@ export default function DroneForm({ initialValues, showStatus = false, onSubmit,
         </div>
       )}
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p className="dc-error-text" style={{ marginBottom: "1rem" }}>{error}</p>}
 
-      <button type="submit" disabled={isSubmitting}>
+      <button type="submit" className="dc-btn dc-btn-primary" disabled={isSubmitting}>
         {isSubmitting ? "Saving…" : submitLabel}
       </button>
     </form>

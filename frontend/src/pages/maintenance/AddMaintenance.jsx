@@ -64,132 +64,112 @@ export default function AddMaintenance() {
   }
 
   return (
-    <div>
-      <h1>Add maintenance record</h1>
-      <form onSubmit={handleSubmit} style={{ maxWidth: 420 }}>
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="drone_id">Drone *</label>
-          <br />
-          <select
-            id="drone_id"
-            required
-            value={values.drone_id}
-            onChange={handleChange("drone_id")}
-            style={{ width: "100%" }}
-          >
-            <option value="" disabled>
-              Select a drone
-            </option>
-            {drones.map((drone) => (
-              <option key={drone.id} value={drone.id}>
-                {drone.name}
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Service & Care</span>
+          <h1>Add maintenance record</h1>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="dc-form dc-card">
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="drone_id">
+              Drone <span className="dc-required">*</span>
+            </label>
+            <select id="drone_id" required className="dc-select" value={values.drone_id} onChange={handleChange("drone_id")}>
+              <option value="" disabled>
+                Select a drone
               </option>
-            ))}
-          </select>
+              {drones.map((drone) => (
+                <option key={drone.id} value={drone.id}>
+                  {drone.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="status">
+              Status <span className="dc-required">*</span>
+            </label>
+            <select id="status" required className="dc-select" value={values.status} onChange={handleChange("status")}>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="maintenance_type">Type *</label>
-          <br />
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="maintenance_type">
+            Type <span className="dc-required">*</span>
+          </label>
           <input
             id="maintenance_type"
             type="text"
             required
             maxLength={50}
             placeholder="e.g. Battery inspection, Motor service"
+            className="dc-input"
             value={values.maintenance_type}
             onChange={handleChange("maintenance_type")}
-            style={{ width: "100%" }}
           />
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="status">Status *</label>
-          <br />
-          <select
-            id="status"
-            required
-            value={values.status}
-            onChange={handleChange("status")}
-            style={{ width: "100%" }}
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="scheduled_date">Scheduled date</label>
-          <br />
-          <input
-            id="scheduled_date"
-            type="date"
-            value={values.scheduled_date}
-            onChange={handleChange("scheduled_date")}
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        {values.status === "Completed" && (
-          <div style={{ marginBottom: "0.75rem" }}>
-            <label htmlFor="completed_date">Completed date *</label>
-            <br />
-            <input
-              id="completed_date"
-              type="date"
-              required
-              value={values.completed_date}
-              onChange={handleChange("completed_date")}
-              style={{ width: "100%" }}
-            />
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="scheduled_date">
+              Scheduled date
+            </label>
+            <input id="scheduled_date" type="date" className="dc-input" value={values.scheduled_date} onChange={handleChange("scheduled_date")} />
           </div>
-        )}
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="technician">Technician</label>
-          <br />
-          <input
-            id="technician"
-            type="text"
-            maxLength={100}
-            value={values.technician}
-            onChange={handleChange("technician")}
-            style={{ width: "100%" }}
-          />
+          {values.status === "Completed" && (
+            <div className="dc-field">
+              <label className="dc-label" htmlFor="completed_date">
+                Completed date <span className="dc-required">*</span>
+              </label>
+              <input
+                id="completed_date"
+                type="date"
+                required
+                className="dc-input"
+                value={values.completed_date}
+                onChange={handleChange("completed_date")}
+              />
+            </div>
+          )}
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="cost">Cost</label>
-          <br />
-          <input
-            id="cost"
-            type="number"
-            min="0"
-            step="0.01"
-            value={values.cost}
-            onChange={handleChange("cost")}
-            style={{ width: "100%" }}
-          />
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="technician">
+              Technician
+            </label>
+            <input id="technician" type="text" maxLength={100} className="dc-input" value={values.technician} onChange={handleChange("technician")} />
+          </div>
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="cost">
+              Cost
+            </label>
+            <input id="cost" type="number" min="0" step="0.01" className="dc-input" value={values.cost} onChange={handleChange("cost")} />
+          </div>
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="notes">Notes</label>
-          <br />
-          <textarea
-            id="notes"
-            rows={3}
-            value={values.notes}
-            onChange={handleChange("notes")}
-            style={{ width: "100%" }}
-          />
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="notes">
+            Notes
+          </label>
+          <textarea id="notes" rows={3} className="dc-textarea" value={values.notes} onChange={handleChange("notes")} />
         </div>
 
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
+        {error && <p className="dc-error-text" style={{ marginBottom: "1rem" }}>{error}</p>}
 
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" className="dc-btn dc-btn-primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving…" : "Add maintenance record"}
         </button>
       </form>

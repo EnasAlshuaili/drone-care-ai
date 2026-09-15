@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getErrorMessage } from "../../api/errors.js";
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from "../../api/notifications.js";
+import { IconInbox } from "../../components/icons.jsx";
+import { notificationIconFor } from "./notificationMeta.js";
 
 const PAGE_SIZE = 20;
 
@@ -13,6 +15,9 @@ function relatedLink(notification) {
   }
   if (notification.related_entity_type === "prediction") {
     return `/predictions/${notification.related_entity_id}`;
+  }
+  if (notification.related_entity_type === "maintenance") {
+    return `/maintenance/${notification.related_entity_id}`;
   }
   return null;
 }
@@ -73,74 +78,86 @@ export default function NotificationList() {
   }
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Notifications {unreadCount > 0 && `(${unreadCount} unread)`}</h1>
-        <button onClick={handleMarkAllRead} disabled={isMarkingAll || unreadCount === 0}>
-          {isMarkingAll ? "Marking…" : "Mark all as read"}
-        </button>
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Notification Center</span>
+          <h1>Notifications{unreadCount > 0 && ` (${unreadCount} unread)`}</h1>
+          <p>Failure alerts, status changes, and maintenance reminders.</p>
+        </div>
+        <div className="dc-actions">
+          <button className="dc-btn dc-btn-secondary" onClick={handleMarkAllRead} disabled={isMarkingAll || unreadCount === 0}>
+            {isMarkingAll ? "Marking…" : "Mark all as read"}
+          </button>
+        </div>
       </div>
 
-      <div style={{ margin: "1rem 0" }}>
-        <label>
-          <input type="checkbox" checked={unreadOnly} onChange={handleUnreadOnlyChange} /> Unread only
-        </label>
-      </div>
+      <label className="dc-checkbox-row" style={{ marginBottom: "1.25rem" }}>
+        <input type="checkbox" checked={unreadOnly} onChange={handleUnreadOnlyChange} />
+        Unread only
+      </label>
 
-      {isLoading && <p>Loading notifications…</p>}
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {isLoading && <div className="dc-skeleton" style={{ height: 220 }} />}
+      {error && <p className="dc-error-text">{error}</p>}
 
       {!isLoading && !error && notifications.length === 0 && (
-        <p>{unreadOnly ? "No unread notifications." : "No notifications yet."}</p>
+        <div className="dc-card dc-state">
+          <div className="dc-state-icon">
+            <IconInbox />
+          </div>
+          <h2 style={{ fontSize: "1.1rem" }}>{unreadOnly ? "No unread notifications" : "No notifications yet"}</h2>
+          <p>You're all caught up.</p>
+        </div>
       )}
 
       {!isLoading && !error && notifications.length > 0 && (
         <>
-          <ul style={{ listStyle: "none", padding: 0, maxWidth: 640 }}>
+          <div style={{ maxWidth: 680 }}>
             {notifications.map((notification) => {
               const link = relatedLink(notification);
+              const meta = notificationIconFor(notification.type);
               return (
-                <li
-                  key={notification.id}
-                  style={{
-                    border: "1px solid #ddd",
-                    borderRadius: 6,
-                    padding: "0.75rem",
-                    marginBottom: "0.5rem",
-                    background: notification.is_read ? "transparent" : "#f0f6ff",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
+                <div key={notification.id} className={`dc-notif${notification.is_read ? "" : " is-unread"}`}>
+                  <span className="dc-notif-icon" style={{ background: meta.soft, color: meta.color }}>
+                    <meta.Icon />
+                  </span>
+                  <div className="dc-notif-body">
+                    <div className="dc-notif-top">
                       {link ? (
-                        <Link to={link} onClick={() => !notification.is_read && handleMarkRead(notification.id)}>
-                          <strong>{notification.title}</strong>
+                        <Link
+                          to={link}
+                          className="dc-notif-title"
+                          onClick={() => !notification.is_read && handleMarkRead(notification.id)}
+                        >
+                          {notification.title}
                         </Link>
                       ) : (
-                        <strong>{notification.title}</strong>
+                        <span className="dc-notif-title">{notification.title}</span>
                       )}
-                      <p style={{ margin: "0.25rem 0" }}>{notification.message}</p>
-                      <span style={{ color: "#52514e", fontSize: "0.85rem" }}>
-                        {new Date(notification.created_at).toLocaleString()}
-                      </span>
+                      <span className="dc-notif-time">{new Date(notification.created_at).toLocaleString()}</span>
                     </div>
+                    <p className="dc-notif-message">{notification.message}</p>
                     {!notification.is_read && (
-                      <button onClick={() => handleMarkRead(notification.id)}>Mark as read</button>
+                      <div className="dc-notif-actions">
+                        <button className="dc-btn dc-btn-ghost dc-btn-sm" onClick={() => handleMarkRead(notification.id)}>
+                          Mark as read
+                        </button>
+                      </div>
                     )}
                   </div>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
 
           <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
+            <button className="dc-btn dc-btn-secondary dc-btn-sm" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
               Previous
             </button>
-            <span>
+            <span className="dc-muted" style={{ fontSize: "0.85rem" }}>
               {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
             </span>
-            <button disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>
+            <button className="dc-btn dc-btn-secondary dc-btn-sm" disabled={offset + PAGE_SIZE >= total} onClick={() => setOffset(offset + PAGE_SIZE)}>
               Next
             </button>
           </div>

@@ -4,20 +4,21 @@
 //
 // Colors follow status semantics, not generic categorical hues: risk levels
 // are states (good/warning/critical), not interchangeable series, so LOW /
-// MEDIUM / HIGH map to the fixed status palette and are always paired with a
-// text label (never color alone). Prediction volume is a single time series,
-// so it uses the sequential default hue (blue) rather than a categorical set.
+// MEDIUM / HIGH map to the fixed brand status palette and are always paired
+// with a text label (never color alone). Prediction volume is a single time
+// series, so it uses the brand's primary accent hue rather than a
+// categorical set.
 
 const RISK_ORDER = ["LOW", "MEDIUM", "HIGH", "NONE"];
 
 const RISK_META = {
-  LOW: { label: "Low risk", color: "#0ca30c" },
-  MEDIUM: { label: "Medium risk", color: "#fab219" },
-  HIGH: { label: "High risk", color: "#d03b3b" },
-  NONE: { label: "No prediction yet", color: "#898781" },
+  LOW: { label: "Low risk", color: "var(--dc-success)" },
+  MEDIUM: { label: "Medium risk", color: "var(--dc-warning)" },
+  HIGH: { label: "High risk", color: "var(--dc-danger)" },
+  NONE: { label: "No prediction yet", color: "var(--dc-neutral)" },
 };
 
-const SEQUENTIAL_BLUE = "#2a78d6";
+const ACCENT = "var(--dc-accent)";
 
 export function RiskDistributionChart({ items }) {
   const byLevel = Object.fromEntries(items.map((item) => [item.risk_level, item.drone_count]));
@@ -31,28 +32,15 @@ export function RiskDistributionChart({ items }) {
         const meta = RISK_META[level];
         const widthPct = (count / max) * 100;
         return (
-          <div
-            key={level}
-            title={`${meta.label}: ${count} drone${count === 1 ? "" : "s"}`}
-            style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.6rem" }}
-          >
-            <span style={{ width: 130, flexShrink: 0, fontSize: "0.9rem", color: "#52514e" }}>
-              {meta.label}
-            </span>
-            <div style={{ flex: 1, background: "#f0efec", borderRadius: 4, height: 20 }}>
+          <div key={level} className="dc-bar-row" title={`${meta.label}: ${count} drone${count === 1 ? "" : "s"}`}>
+            <span className="dc-bar-label">{meta.label}</span>
+            <div className="dc-bar-track">
               <div
-                style={{
-                  width: `${widthPct}%`,
-                  minWidth: count > 0 ? 4 : 0,
-                  height: 20,
-                  background: meta.color,
-                  borderRadius: 4,
-                }}
+                className="dc-bar-fill"
+                style={{ width: `${widthPct}%`, minWidth: count > 0 ? 4 : 0, background: meta.color }}
               />
             </div>
-            <span style={{ width: 28, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-              {count}
-            </span>
+            <span className="dc-bar-count">{count}</span>
           </div>
         );
       })}
@@ -75,7 +63,7 @@ export function PredictionVolumeChart({ items }) {
           alignItems: "flex-end",
           gap: "2px",
           height: 140,
-          borderBottom: "1px solid #c3c2b7",
+          borderBottom: "1px solid var(--dc-border)",
           padding: "0 4px",
         }}
       >
@@ -99,13 +87,13 @@ export function PredictionVolumeChart({ items }) {
               }}
             >
               {isPeak && (
-                <span style={{ fontSize: "0.7rem", color: "#52514e", marginBottom: 2 }}>{point.count}</span>
+                <span style={{ fontSize: "0.7rem", color: "var(--dc-text-muted)", marginBottom: 2 }}>{point.count}</span>
               )}
               <div
                 style={{
                   width: "100%",
                   height: heightPx,
-                  background: SEQUENTIAL_BLUE,
+                  background: `linear-gradient(180deg, ${ACCENT}, var(--dc-accent-2))`,
                   borderRadius: "4px 4px 0 0",
                 }}
               />
@@ -115,32 +103,33 @@ export function PredictionVolumeChart({ items }) {
       </div>
 
       <details style={{ marginTop: "0.75rem" }}>
-        <summary>View as table</summary>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "0.5rem" }}>
-          <thead>
-            <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-              <th>Date</th>
-              <th>Predictions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((point) => (
-              <tr key={point.date}>
-                <td>{point.date}</td>
-                <td>{point.count}</td>
+        <summary style={{ cursor: "pointer", color: "var(--dc-text-muted)", fontSize: "0.85rem" }}>View as table</summary>
+        <div className="dc-table-wrap" style={{ marginTop: "0.5rem" }}>
+          <table className="dc-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Predictions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((point) => (
+                <tr key={point.date}>
+                  <td>{point.date}</td>
+                  <td>{point.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </details>
     </div>
   );
 }
 
 // A single ratio against a limit is a meter, not a bar chart (dataviz form
-// heuristic) — the fill and unfilled track are two steps of the same blue
-// ramp ("blue-on-blue"), since completion rate is a magnitude, not a
-// severity state.
+// heuristic) — the fill and unfilled track are two steps of the brand
+// accent, since completion rate is a magnitude, not a severity state.
 export function MaintenanceCompletionMeter({ stats }) {
   if (stats.total === 0) {
     return <p>No maintenance records yet.</p>;
@@ -150,47 +139,46 @@ export function MaintenanceCompletionMeter({ stats }) {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.5rem" }}>
-        <span style={{ fontSize: "2rem", fontWeight: 600 }}>{rate}%</span>
-        <span style={{ color: "#52514e", fontSize: "0.9rem" }}>completed</span>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", marginBottom: "0.75rem" }}>
+        <span style={{ fontSize: "2rem", fontWeight: 700, color: "var(--dc-text)" }}>{rate}%</span>
+        <span className="dc-muted" style={{ fontSize: "0.9rem" }}>completed</span>
       </div>
-      <div
-        title={`${stats.completed} of ${stats.total} maintenance records completed`}
-        style={{ background: "#cde2fb", borderRadius: 4, height: 20, marginBottom: "0.75rem" }}
-      >
-        <div style={{ width: `${rate}%`, height: 20, background: "#2a78d6", borderRadius: 4 }} />
+      <div className="dc-progress-track" style={{ margin: "0 0 1rem", maxWidth: "none" }} title={`${stats.completed} of ${stats.total} maintenance records completed`}>
+        <div className="dc-progress-fill" style={{ width: `${rate}%`, background: `linear-gradient(90deg, ${ACCENT}, var(--dc-accent-2))` }} />
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-            <th>Status</th>
-            <th>Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Scheduled</td>
-            <td>{stats.scheduled}</td>
-          </tr>
-          <tr>
-            <td>In Progress</td>
-            <td>{stats.in_progress}</td>
-          </tr>
-          <tr>
-            <td>Completed</td>
-            <td>{stats.completed}</td>
-          </tr>
-          <tr>
-            <td style={{ color: "#d03b3b" }}>Overdue</td>
-            <td>{stats.overdue}</td>
-          </tr>
-          <tr>
-            <td>Cancelled</td>
-            <td>{stats.cancelled}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="dc-table-wrap">
+        <table className="dc-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Scheduled</td>
+              <td>{stats.scheduled}</td>
+            </tr>
+            <tr>
+              <td>In Progress</td>
+              <td>{stats.in_progress}</td>
+            </tr>
+            <tr>
+              <td>Completed</td>
+              <td>{stats.completed}</td>
+            </tr>
+            <tr>
+              <td style={{ color: "var(--dc-danger)" }}>Overdue</td>
+              <td>{stats.overdue}</td>
+            </tr>
+            <tr>
+              <td>Cancelled</td>
+              <td>{stats.cancelled}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

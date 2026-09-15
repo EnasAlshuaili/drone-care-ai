@@ -79,205 +79,181 @@ export default function AddFlight() {
   }
 
   return (
-    <div>
-      <h1>Add flight</h1>
-      <form onSubmit={handleSubmit} style={{ maxWidth: 420 }}>
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="drone_id">Drone *</label>
-          <br />
-          <select
-            id="drone_id"
-            required
-            value={values.drone_id}
-            onChange={handleChange("drone_id")}
-            style={{ width: "100%" }}
-          >
-            <option value="" disabled>
-              Select a drone
-            </option>
-            {drones.map((drone) => (
-              <option key={drone.id} value={drone.id}>
-                {drone.name}
+    <div className="dc-page">
+      <div className="dc-page-header">
+        <div>
+          <span className="dc-eyebrow">Telemetry</span>
+          <h1>Add flight</h1>
+          <p>Log a completed flight and its telemetry.</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="dc-form dc-card" style={{ maxWidth: 520 }}>
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="drone_id">
+              Drone <span className="dc-required">*</span>
+            </label>
+            <select id="drone_id" required className="dc-select" value={values.drone_id} onChange={handleChange("drone_id")}>
+              <option value="" disabled>
+                Select a drone
               </option>
-            ))}
-          </select>
+              {drones.map((drone) => (
+                <option key={drone.id} value={drone.id}>
+                  {drone.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="flight_status">
+              Flight status <span className="dc-required">*</span>
+            </label>
+            <select id="flight_status" required className="dc-select" value={values.flight_status} onChange={handleChange("flight_status")}>
+              {FLIGHT_STATUS_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="flight_datetime">Flight date/time *</label>
-          <br />
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="flight_datetime">
+            Flight date/time <span className="dc-required">*</span>
+          </label>
           <input
             id="flight_datetime"
             type="datetime-local"
             required
+            className="dc-input"
             value={values.flight_datetime}
             onChange={handleChange("flight_datetime")}
-            style={{ width: "100%" }}
           />
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="flight_status">Flight status *</label>
-          <br />
-          <select
-            id="flight_status"
-            required
-            value={values.flight_status}
-            onChange={handleChange("flight_status")}
-            style={{ width: "100%" }}
-          >
-            {FLIGHT_STATUS_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="application">Application</label>
-          <br />
+        <div className="dc-field">
+          <label className="dc-label" htmlFor="application">
+            Application
+          </label>
           <input
             id="application"
             type="text"
             maxLength={50}
             placeholder="e.g. Survey, Delivery, Inspection"
+            className="dc-input"
             value={values.application}
             onChange={handleChange("application")}
-            style={{ width: "100%" }}
           />
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="altitude">Altitude (m)</label>
-          <br />
-          <input
-            id="altitude"
-            type="number"
-            min="0"
-            step="any"
-            value={values.altitude}
-            onChange={handleChange("altitude")}
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="flight_duration">Flight duration (minutes)</label>
-          <br />
-          <input
-            id="flight_duration"
-            type="number"
-            min="0"
-            step="any"
-            value={values.flight_duration}
-            onChange={handleChange("flight_duration")}
-            style={{ width: "100%" }}
-          />
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="altitude">
+              Altitude (m)
+            </label>
+            <input id="altitude" type="number" min="0" step="any" className="dc-input" value={values.altitude} onChange={handleChange("altitude")} />
+          </div>
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="flight_duration">
+              Duration (min)
+            </label>
+            <input
+              id="flight_duration"
+              type="number"
+              min="0"
+              step="any"
+              className="dc-input"
+              value={values.flight_duration}
+              onChange={handleChange("flight_duration")}
+            />
+          </div>
         </div>
 
         {/* Unit intentionally not labeled: the Data Dictionary marks distance_flown's
             unit as TBD (m or km) — see Phase 4 report, Provisional Decisions. */}
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="distance_flown">Distance flown</label>
-          <br />
-          <input
-            id="distance_flown"
-            type="number"
-            min="0"
-            step="any"
-            value={values.distance_flown}
-            onChange={handleChange("distance_flown")}
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="battery_remaining">Battery remaining (%)</label>
-          <br />
-          <input
-            id="battery_remaining"
-            type="number"
-            min="0"
-            max="100"
-            step="any"
-            value={values.battery_remaining}
-            onChange={handleChange("battery_remaining")}
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="gps_accuracy">GPS accuracy (m)</label>
-          <br />
-          <input
-            id="gps_accuracy"
-            type="number"
-            min="0"
-            step="any"
-            value={values.gps_accuracy}
-            onChange={handleChange("gps_accuracy")}
-            style={{ width: "100%" }}
-          />
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="distance_flown">
+              Distance flown
+            </label>
+            <input
+              id="distance_flown"
+              type="number"
+              min="0"
+              step="any"
+              className="dc-input"
+              value={values.distance_flown}
+              onChange={handleChange("distance_flown")}
+            />
+          </div>
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="battery_remaining">
+              Battery remaining (%)
+            </label>
+            <input
+              id="battery_remaining"
+              type="number"
+              min="0"
+              max="100"
+              step="any"
+              className="dc-input"
+              value={values.battery_remaining}
+              onChange={handleChange("battery_remaining")}
+            />
+          </div>
         </div>
 
         {/* Unit intentionally not labeled: wind_speed's unit is also marked TBD
             (km/h or m/s) in the Data Dictionary. */}
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="wind_speed">Wind speed</label>
-          <br />
-          <input
-            id="wind_speed"
-            type="number"
-            min="0"
-            step="any"
-            value={values.wind_speed}
-            onChange={handleChange("wind_speed")}
-            style={{ width: "100%" }}
-          />
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="gps_accuracy">
+              GPS accuracy (m)
+            </label>
+            <input id="gps_accuracy" type="number" min="0" step="any" className="dc-input" value={values.gps_accuracy} onChange={handleChange("gps_accuracy")} />
+          </div>
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="wind_speed">
+              Wind speed
+            </label>
+            <input id="wind_speed" type="number" min="0" step="any" className="dc-input" value={values.wind_speed} onChange={handleChange("wind_speed")} />
+          </div>
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label>
+        <div className="dc-form-row">
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="payload_type">
+              Payload type
+            </label>
+            <input id="payload_type" type="text" maxLength={50} className="dc-input" value={values.payload_type} onChange={handleChange("payload_type")} />
+          </div>
+          <div className="dc-field">
+            <label className="dc-label" htmlFor="actual_carry_weight">
+              Actual carry weight (kg)
+            </label>
             <input
-              type="checkbox"
-              checked={values.obstacles_encountered}
-              onChange={handleChange("obstacles_encountered")}
-            />{" "}
-            Obstacles encountered
-          </label>
+              id="actual_carry_weight"
+              type="number"
+              min="0"
+              step="any"
+              className="dc-input"
+              value={values.actual_carry_weight}
+              onChange={handleChange("actual_carry_weight")}
+            />
+          </div>
         </div>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="payload_type">Payload type</label>
-          <br />
-          <input
-            id="payload_type"
-            type="text"
-            maxLength={50}
-            value={values.payload_type}
-            onChange={handleChange("payload_type")}
-            style={{ width: "100%" }}
-          />
-        </div>
+        <label className="dc-checkbox-row" style={{ marginBottom: "1.25rem" }}>
+          <input type="checkbox" checked={values.obstacles_encountered} onChange={handleChange("obstacles_encountered")} />
+          Obstacles encountered
+        </label>
 
-        <div style={{ marginBottom: "0.75rem" }}>
-          <label htmlFor="actual_carry_weight">Actual carry weight (kg)</label>
-          <br />
-          <input
-            id="actual_carry_weight"
-            type="number"
-            min="0"
-            step="any"
-            value={values.actual_carry_weight}
-            onChange={handleChange("actual_carry_weight")}
-            style={{ width: "100%" }}
-          />
-        </div>
+        {error && <p className="dc-error-text" style={{ marginBottom: "1rem" }}>{error}</p>}
 
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
-
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" className="dc-btn dc-btn-primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving…" : "Add flight"}
         </button>
       </form>
