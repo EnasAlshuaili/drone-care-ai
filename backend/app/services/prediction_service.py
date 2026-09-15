@@ -9,8 +9,10 @@ drone_service.get_drone_or_404() + ensure_owner() before calling into this
 module (see app/api/v1/predictions.py).
 
 High-risk notification creation (FR-PRED-04) is deliberately NOT implemented
-here: it belongs to the Notifications phase, which is out of scope for this
-ANN Model Integration phase.
+here — it is triggered from app/api/v1/predictions.py's create_prediction
+endpoint (Phase 9), which already has the Drone in hand and reacts to the
+risk_level this module computes, rather than this module taking on a
+notifications dependency.
 """
 
 import uuid

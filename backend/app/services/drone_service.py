@@ -5,6 +5,12 @@ Ownership is never decided here — every function that needs it takes the
 already-authenticated owning user_id (create) or expects the caller to run
 ensure_owner() on the returned Drone before mutating it (get/update/delete),
 exactly as documented in app/services/authorization.py.
+
+FR-NOTIF-01 (Phase 9): a drone status change notifies its owner. Both
+update_drone and deactivate_drone only call notification_service when the
+status actually changed — this is what prevents a duplicate notification
+when the same status is resubmitted (e.g. deactivating an already-inactive
+drone, or a no-op update carrying the current status).
 """
 
 import uuid
@@ -15,6 +21,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ConflictError, NotFoundError
 from app.models.drone import Drone
 from app.schemas.drone import DroneCreate, DroneUpdate
+from app.services import notification_service
 
 
 def create_drone(db: Session, owner_id: uuid.UUID, drone_in: DroneCreate) -> Drone:
@@ -76,12 +83,17 @@ def update_drone(db: Session, drone: Drone, drone_in: DroneUpdate) -> Drone:
         if duplicate is not None:
             raise ConflictError(f"You already have a drone with serial number '{new_serial}'.")
 
+    old_status = drone.status
     for field, value in updates.items():
         setattr(drone, field, value.value if hasattr(value, "value") else value)
 
     db.add(drone)
     db.commit()
     db.refresh(drone)
+
+    if drone.status != old_status:
+        notification_service.notify_drone_status_change(db, drone, old_status, drone.status)
+
     return drone
 
 
@@ -90,8 +102,10 @@ def deactivate_drone(db: Session, drone: Drone) -> Drone:
     related flights/predictions/maintenance_records/reminders row) intact —
     per FR-DRONE-04 / NFR-07. Idempotent if already inactive."""
     if drone.status != "inactive":
+        old_status = drone.status
         drone.status = "inactive"
         db.add(drone)
         db.commit()
         db.refresh(drone)
+        notification_service.notify_drone_status_change(db, drone, old_status, drone.status)
     return drone

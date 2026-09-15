@@ -7,6 +7,11 @@ resolves the relevant drone and calls the existing ensure_owner() before
 touching any prediction data — never trusting a client-supplied drone_id or
 prediction_id as proof of ownership by itself (same pattern as
 app/api/v1/flights.py).
+
+FR-PRED-04 / BR-07 (Phase 9): a HIGH-risk prediction triggers a notification
+for the drone's owner. This reacts to the risk_level prediction_service
+already computed via the validated ANN + app/core/ml_config.classify_risk —
+it never recomputes or second-guesses that classification.
 """
 
 import uuid
@@ -15,6 +20,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
+from app.core.ml_config import RiskLevel
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.prediction import (
@@ -24,7 +30,7 @@ from app.schemas.prediction import (
     PredictionSchemaResponse,
     build_prediction_schema,
 )
-from app.services import drone_service, prediction_service
+from app.services import drone_service, notification_service, prediction_service
 from app.services.authorization import ensure_owner
 from app.services.prediction_service import DEFAULT_LIMIT, MAX_LIMIT
 
@@ -39,7 +45,10 @@ def create_prediction(
 ):
     drone = drone_service.get_drone_or_404(db, prediction_in.drone_id)
     ensure_owner(drone.user_id, current_user)
-    return prediction_service.create_prediction(db, drone.id, prediction_in)
+    prediction = prediction_service.create_prediction(db, drone.id, prediction_in)
+    if prediction.risk_level == RiskLevel.HIGH.value:
+        notification_service.notify_high_risk_prediction(db, drone, prediction)
+    return prediction
 
 
 @router.get("", response_model=PredictionListResponse)

@@ -3,10 +3,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { deactivateDrone, getDrone } from "../../api/drones.js";
 import { getErrorMessage } from "../../api/errors.js";
 
-// Shows the drone entity's own fields plus a lightweight link into its
-// flight history (Phase 4). Predictions, maintenance history, and alerts are
-// added to this page in later phases once those modules exist (see System
-// Specification §7, FR-DRONE-05).
+// Shows the drone entity's own fields plus lightweight links into its
+// flight history, prediction history, and maintenance history. Alerts are
+// added to this page in a later phase (see System Specification §7,
+// FR-DRONE-05).
 export default function DroneDetails() {
   const { droneId } = useParams();
   const navigate = useNavigate();
@@ -91,6 +91,18 @@ export default function DroneDetails() {
         </Link>
         <Link to={`/flights/new?droneId=${drone.id}`}>
           <button>Add flight</button>
+        </Link>
+        <Link to={`/predictions?droneId=${drone.id}`}>
+          <button>View predictions</button>
+        </Link>
+        <Link to={`/predictions/new?droneId=${drone.id}`}>
+          <button>New prediction</button>
+        </Link>
+        <Link to={`/maintenance?droneId=${drone.id}`}>
+          <button>View maintenance</button>
+        </Link>
+        <Link to={`/maintenance/new?droneId=${drone.id}`}>
+          <button>Add maintenance</button>
         </Link>
       </div>
     </div>

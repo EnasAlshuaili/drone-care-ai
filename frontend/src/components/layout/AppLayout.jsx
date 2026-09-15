@@ -29,6 +29,10 @@ export default function AppLayout({ children }) {
           </Link>
           {isAuthenticated && <Link to="/drones">My Drones</Link>}
           {isAuthenticated && <Link to="/flights">Flights</Link>}
+          {isAuthenticated && <Link to="/maintenance">Maintenance</Link>}
+          {isAuthenticated && <Link to="/predictions">Predictions</Link>}
+          {isAuthenticated && <Link to="/analytics">Analytics</Link>}
+          {isAuthenticated && <Link to="/notifications">Notifications</Link>}
         </span>
         {isAuthenticated && (
           <span>
