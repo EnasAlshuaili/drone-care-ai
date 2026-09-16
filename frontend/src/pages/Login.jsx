@@ -142,7 +142,7 @@ export default function Login() {
           </form>
 
           <p className="dc-auth-footer">
-            No account? <Link to="/register">Register</Link>
+            Don't have an account? <Link to="/register">Create account</Link>
           </p>
         </div>
       </div>

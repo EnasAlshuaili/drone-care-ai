@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
       POSTGRES_DB: ${POSTGRES_DB:-dronecare}
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - dronecare_db_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,7 +24,7 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://dronecare:change-me@db:5432/dronecare}
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend:/app
       # ML artifacts (Phase 6): backend/app/core/config.py's default
@@ -47,7 +47,7 @@ services:
     environment:
       VITE_API_BASE_URL: ${BACKEND_URL:-http://localhost:8000}
     ports:
-      - "5173:5173"
+      - "5175:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules

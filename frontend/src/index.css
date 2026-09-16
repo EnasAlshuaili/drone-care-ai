@@ -819,6 +819,7 @@ a:hover {
    ========================================================================== */
 
 .dc-auth {
+  position: relative;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1.1fr 1fr;
@@ -831,16 +832,54 @@ a:hover {
   }
 }
 
+/* Cinematic full-bleed photo background — shared by Login and Register so
+   both auth pages read as the same product screen. */
+.dc-auth::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/branding/dronecare-auth-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.dc-auth::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(5, 11, 24, 0.74) 0%,
+    rgba(5, 11, 24, 0.32) 42%,
+    rgba(5, 11, 24, 0.18) 58%,
+    rgba(5, 11, 24, 0.7) 100%
+  );
+  z-index: 0;
+}
+
+@media (max-width: 900px) {
+  .dc-auth::after {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 11, 24, 0.5) 0%,
+      rgba(5, 11, 24, 0.78) 55%,
+      rgba(5, 11, 24, 0.94) 100%
+    );
+  }
+}
+
 .dc-auth-visual {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Content clusters toward the top rather than centering vertically, so
+     the drone in the background photo stays visible below it. */
+  justify-content: flex-start;
   padding: var(--dc-space-7);
+  padding-top: 96px;
   overflow: hidden;
-  background: radial-gradient(circle at 15% 20%, rgba(0, 217, 255, 0.12), transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(22, 199, 201, 0.1), transparent 50%),
-    linear-gradient(160deg, var(--dc-navy-900) 0%, var(--dc-navy-950) 70%);
 }
 
 @media (max-width: 900px) {
@@ -851,48 +890,24 @@ a:hover {
   }
 }
 
-.dc-auth-visual::before {
-  /* faint circuit/grid texture — CSS only, no image asset */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgba(0, 217, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 217, 255, 0.06) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at 20% 30%, black, transparent 65%);
-  pointer-events: none;
-}
-
-.dc-auth-visual::after {
-  content: "";
-  position: absolute;
-  width: 480px;
-  height: 480px;
-  border-radius: 50%;
-  right: -160px;
-  bottom: -160px;
-  background: radial-gradient(circle, rgba(0, 217, 255, 0.14), transparent 70%);
-  pointer-events: none;
-}
-
 .dc-auth-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: var(--dc-space-6);
+  gap: 16px;
+  margin-bottom: 24px;
   position: relative;
   z-index: 1;
 }
 
 .dc-auth-brand img {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
   box-shadow: 0 0 0 1px var(--dc-border), 0 0 28px rgba(0, 217, 255, 0.3);
 }
 
 .dc-auth-brand-name {
-  font-size: 1.6rem;
+  font-size: 2.6rem;
   font-weight: 800;
   letter-spacing: -0.01em;
 }
@@ -906,12 +921,12 @@ a:hover {
 .dc-auth-tagline {
   position: relative;
   z-index: 1;
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 2.4rem;
+  font-weight: 800;
   color: var(--dc-text);
   line-height: 1.25;
-  max-width: 420px;
-  margin-bottom: var(--dc-space-2);
+  max-width: 480px;
+  margin-bottom: 16px;
 }
 
 .dc-auth-tagline span {
@@ -923,7 +938,26 @@ a:hover {
   z-index: 1;
   color: var(--dc-text-muted);
   max-width: 380px;
-  margin-bottom: var(--dc-space-6);
+  margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+  .dc-auth-visual {
+    padding-top: var(--dc-space-5);
+  }
+
+  .dc-auth-brand img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .dc-auth-brand-name {
+    font-size: 1.6rem;
+  }
+
+  .dc-auth-tagline {
+    font-size: 1.6rem;
+  }
 }
 
 .dc-auth-features {
@@ -972,6 +1006,8 @@ a:hover {
 }
 
 .dc-auth-form-side {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -981,10 +1017,10 @@ a:hover {
 .dc-auth-card {
   width: 100%;
   max-width: 400px;
-  background: rgba(16, 42, 67, 0.55);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--dc-border-strong);
+  background: rgba(11, 31, 58, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(155, 175, 195, 0.28);
   border-radius: var(--dc-radius-lg);
   padding: var(--dc-space-6);
   box-shadow: var(--dc-shadow-lg);
@@ -999,9 +1035,16 @@ a:hover {
 
 .dc-auth-card-subtitle {
   margin-top: 6px;
-  margin-bottom: var(--dc-space-5);
+  margin-bottom: var(--dc-space-4);
   color: var(--dc-text-muted);
   font-size: 0.9rem;
+}
+
+/* Auth cards can hold more than two fields (e.g. registration) — a tighter
+   field rhythm here keeps the card from ballooning past the sign-in card's
+   proportions while other forms in the app keep the roomier default. */
+.dc-auth-card .dc-field {
+  margin-bottom: var(--dc-space-3);
 }
 
 .dc-auth-row {
@@ -1025,6 +1068,10 @@ a:hover {
 
 .dc-input-icon-wrap .dc-input {
   padding-left: 40px;
+}
+
+.dc-input-icon-wrap:has(.dc-input-toggle) .dc-input {
+  padding-right: 38px;
 }
 
 .dc-input-icon {

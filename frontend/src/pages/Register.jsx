@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IconChart, IconLock, IconMail, IconPulse, IconShieldCheck, IconUser, IconWrench } from "../components/icons.jsx";
+import {
+  IconChart,
+  IconEye,
+  IconEyeOff,
+  IconLock,
+  IconMail,
+  IconPulse,
+  IconShieldCheck,
+  IconUser,
+  IconWrench,
+} from "../components/icons.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const FEATURES = [
@@ -20,6 +30,8 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -81,7 +93,7 @@ export default function Register() {
           <h1>
             Create <span>account</span>
           </h1>
-          <p className="dc-auth-card-subtitle">Set up your DroneCare operator account</p>
+          <p className="dc-auth-card-subtitle">Create your DroneCare account to get started</p>
 
           <form onSubmit={handleSubmit}>
             <div className="dc-field">
@@ -137,7 +149,7 @@ export default function Register() {
                   </span>
                   <input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     minLength={8}
                     maxLength={72}
@@ -146,6 +158,14 @@ export default function Register() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    className="dc-input-toggle"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <IconEyeOff /> : <IconEye />}
+                  </button>
                 </div>
               </div>
               <div className="dc-field">
@@ -158,7 +178,7 @@ export default function Register() {
                   </span>
                   <input
                     id="passwordConfirm"
-                    type="password"
+                    type={showPasswordConfirm ? "text" : "password"}
                     required
                     minLength={8}
                     maxLength={72}
@@ -167,6 +187,14 @@ export default function Register() {
                     value={passwordConfirm}
                     onChange={(e) => setPasswordConfirm(e.target.value)}
                   />
+                  <button
+                    type="button"
+                    className="dc-input-toggle"
+                    onClick={() => setShowPasswordConfirm((v) => !v)}
+                    aria-label={showPasswordConfirm ? "Hide password" : "Show password"}
+                  >
+                    {showPasswordConfirm ? <IconEyeOff /> : <IconEye />}
+                  </button>
                 </div>
               </div>
             </div>
